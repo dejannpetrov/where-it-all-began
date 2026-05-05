@@ -41,7 +41,7 @@ canvas {
     z-index: 2;
 }
 
-/* CONTENT */
+/* MAIN CONTENT */
 .container {
     position: relative;
     z-index: 3;
@@ -120,7 +120,7 @@ button:hover {
 <!-- PARTICLES -->
 <canvas id="particles"></canvas>
 
-<!-- LANDING -->
+<!-- MAIN -->
 <div class="container">
     <h1>A Place Worth Remembering</h1>
     <button onclick="startExperience()">Begin</button>
@@ -130,7 +130,7 @@ button:hover {
 <div id="quote">Where it Began...</div>
 
 <script>
-/* PARTICLES */
+/* ---------------- PARTICLES ---------------- */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
@@ -146,7 +146,7 @@ for (let i = 0; i < 60; i++) {
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         r: Math.random() * 2,
-        d: Math.random() * 0.5
+        d: Math.random() * 0.6
     });
 }
 
@@ -172,7 +172,7 @@ function drawParticles() {
 
 setInterval(drawParticles, 33);
 
-/* EXPERIENCE */
+/* ---------------- EXPERIENCE FLOW ---------------- */
 function startExperience() {
     const container = document.querySelector('.container');
     const video = document.getElementById('video');
@@ -180,30 +180,30 @@ function startExperience() {
 
     container.style.opacity = "0";
 
-    // 1. show quote
+    // Show quote first
     setTimeout(() => {
         quote.style.opacity = "1";
         quote.style.transform = "translate(-50%, -50%) scale(1)";
     }, 500);
 
-    // 2. START VIDEO slightly BEFORE quote fades out
+    // Start video slightly BEFORE quote fades
     setTimeout(() => {
         video.muted = true;
+        video.currentTime = 0;
         video.play();
-    }, 2000); // 👈 starts early
+    }, 1800);
 
-    // 3. fade quote + reveal video clarity
+    // Fade quote + reveal video clarity
     setTimeout(() => {
         quote.style.opacity = "0";
         quote.style.transform = "translate(-50%, -50%) scale(0.95)";
 
         video.style.filter = "brightness(1) blur(0px)";
         video.style.transform = "scale(1)";
-    }, 2500); // 👈 this is your “Where it Began…” fade moment
-}
+    }, 2500);
 }
 
-/* RESIZE */
+/* ---------------- RESIZE ---------------- */
 window.addEventListener("resize", resizeCanvas);
 </script>
 
