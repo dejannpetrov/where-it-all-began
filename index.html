@@ -31,7 +31,7 @@ video {
     object-fit: cover;
     filter: brightness(0.4) blur(6px);
     transform: scale(1.05);
-    transition: filter 2s ease, transform 2s ease, opacity 1s ease;
+    transition: 1.5s ease;
 }
 
 /* PARTICLES */
@@ -46,41 +46,35 @@ canvas {
     position: relative;
     z-index: 3;
     height: 100vh;
-    padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    text-align: center;
     color: white;
+    text-align: center;
     transition: opacity 0.8s ease;
 }
 
 h1 {
     font-weight: 300;
     letter-spacing: 2px;
-    margin-bottom: 40px;
-    opacity: 0.85;
+    margin-bottom: 30px;
     font-size: clamp(20px, 5vw, 28px);
 }
 
 /* BUTTON */
 button {
-    padding: 16px 42px;
-    font-size: 15px;
-    letter-spacing: 1px;
+    padding: 16px 40px;
+    border-radius: 999px;
     border: 1px solid rgba(255,255,255,0.8);
     background: rgba(255,255,255,0.08);
     color: white;
+    font-size: 15px;
     cursor: pointer;
-    border-radius: 999px;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
 }
 
-button:hover {
-    background: white;
-    color: black;
+button:active {
+    transform: scale(0.98);
 }
 
 /* QUOTE */
@@ -88,64 +82,28 @@ button:hover {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.95);
+    transform: translate(-50%, -50%);
     font-size: clamp(18px, 5vw, 28px);
-    letter-spacing: 2px;
-    font-style: italic;
     color: white;
     opacity: 0;
     z-index: 4;
     white-space: nowrap;
-    transition: opacity 1.5s ease, transform 1.5s ease;
+    transition: opacity 1.2s ease;
 }
 
-/* IMAGE OVERLAY */
-#imgOverlay {
+/* FINAL */
+#final {
     position: fixed;
     inset: 0;
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: opacity 1s ease;
-    background: rgba(0,0,0,0.3);
-}
-
-#imgOverlay img {
-    position: absolute;
-    width: 80%;
-    max-width: 360px;
-    border-radius: 18px;
-    opacity: 0;
-    transform: scale(1.05);
-    transition: opacity 1s ease, transform 1s ease;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-
-/* FINAL SCREEN */
-#finalScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
     background: black;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: clamp(18px, 5vw, 28px);
-    letter-spacing: 2px;
+    font-size: 22px;
     opacity: 0;
-    transition: opacity 2s ease;
-    text-align: center;
-}
-
-/* MOBILE */
-@media (max-width: 480px) {
-    button {
-        padding: 14px 32px;
-        font-size: 14px;
-    }
+    z-index: 20;
+    transition: opacity 1.5s ease;
 }
 </style>
 </head>
@@ -163,139 +121,106 @@ button:hover {
 <!-- MAIN -->
 <div class="container">
     <h1>A Place Worth Remembering</h1>
-    <button onclick="startExperience()">Begin</button>
+    <button id="startBtn">Begin</button>
 </div>
 
 <!-- QUOTE -->
 <div id="quote">Where it Began...</div>
 
-<!-- IMAGE OVERLAY -->
-<div id="imgOverlay"></div>
-
 <!-- FINAL -->
-<div id="finalScreen">Everything began here...</div>
+<div id="final">Everything began here...</div>
 
 <script>
-/* PARTICLES */
+
+/* ---------------- PARTICLES ---------------- */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
-function resizeCanvas() {
+function resize() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
-resizeCanvas();
+resize();
 
 let particles = [];
-for (let i = 0; i < 60; i++) {
+for (let i = 0; i < 50; i++) {
     particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         r: Math.random() * 2,
-        d: Math.random() * 0.6
+        d: Math.random() * 0.5
     });
 }
 
-function drawParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle = "white";
     ctx.globalAlpha = 0.4;
 
     particles.forEach(p => {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
         ctx.fill();
-    });
 
-    particles.forEach(p => {
         p.y += p.d;
-        if (p.y > canvas.height) {
+        if(p.y > canvas.height){
             p.y = 0;
-            p.x = Math.random() * canvas.width;
+            p.x = Math.random()*canvas.width;
         }
     });
 }
-setInterval(drawParticles, 33);
+setInterval(draw, 33);
 
-/* IMAGES */
-const overlay = document.getElementById("imgOverlay");
+/* ---------------- MAIN FLOW ---------------- */
 
-const images = ["img1.jpg", "img2.jpg", "img3.jpg"];
+const btn = document.getElementById("startBtn");
 
-let imgElements = images.map(src => {
-    let img = document.createElement("img");
-    img.src = src;
-    overlay.appendChild(img);
-    return img;
+btn.addEventListener("click", () => {
+    start();
 });
 
-/* EXPERIENCE */
-function startExperience() {
-    const container = document.querySelector('.container');
-    const video = document.getElementById('video');
-    const quote = document.getElementById('quote');
-    const finalScreen = document.getElementById('finalScreen');
+function start() {
+    const container = document.querySelector(".container");
+    const video = document.getElementById("video");
+    const quote = document.getElementById("quote");
+    const final = document.getElementById("final");
 
+    // hide main
     container.style.opacity = "0";
 
-    /* quote */
+    // show quote
     setTimeout(() => {
         quote.style.opacity = "1";
-        quote.style.transform = "translate(-50%, -50%) scale(1)";
     }, 500);
 
-    /* start video early */
+    // start video (SAFE delayed start)
     setTimeout(() => {
         video.muted = true;
         video.currentTime = 0;
-        video.play();
-    }, 1800);
 
-    /* reveal clarity + start image sequence */
+        video.play().catch(err => {
+            console.log("Video blocked, retrying...");
+        });
+    }, 1200);
+
+    // reveal video clarity
     setTimeout(() => {
         quote.style.opacity = "0";
-
         video.style.filter = "brightness(1) blur(0px)";
         video.style.transform = "scale(1)";
-    }, 2500);
+    }, 2200);
 
-    /* IMAGE SEQUENCE near end */
-    video.ontimeupdate = () => {
-        const t = video.currentTime;
-        const end = video.duration;
-
-        if (end - t <= 3 && !window.imgStarted) {
-            window.imgStarted = true;
-
-            overlay.style.opacity = "1";
-
-            setTimeout(() => {
-                imgElements[0].style.opacity = "1";
-            }, 0);
-
-            setTimeout(() => {
-                imgElements[0].style.opacity = "0";
-                imgElements[1].style.opacity = "1";
-            }, 900);
-
-            setTimeout(() => {
-                imgElements[1].style.opacity = "0";
-                imgElements[2].style.opacity = "1";
-            }, 1800);
-        }
-
-        /* FINAL END */
-        if (end - t <= 0.5 && !window.done) {
-            window.done = true;
-
-            overlay.style.opacity = "0";
-            finalScreen.style.opacity = "1";
+    // final ending
+    video.addEventListener("timeupdate", () => {
+        if (video.duration && video.currentTime > video.duration - 0.5) {
+            final.style.opacity = "1";
             video.style.opacity = "0";
         }
-    };
+    });
 }
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", resize);
+
 </script>
 
 </body>
