@@ -18,7 +18,7 @@ body {
     overflow: hidden;
 }
 
-/* VIDEO BACKGROUND */
+/* VIDEO */
 #videoContainer {
     position: fixed;
     inset: 0;
@@ -31,7 +31,7 @@ video {
     object-fit: cover;
     filter: brightness(0.4) blur(6px);
     transform: scale(1.05);
-    transition: filter 2s ease, transform 2s ease;
+    transition: filter 2s ease, transform 2s ease, opacity 1s ease;
 }
 
 /* PARTICLES */
@@ -41,7 +41,7 @@ canvas {
     z-index: 2;
 }
 
-/* MAIN CONTENT */
+/* MAIN */
 .container {
     position: relative;
     z-index: 3;
@@ -81,7 +81,6 @@ button {
 button:hover {
     background: white;
     color: black;
-    box-shadow: 0 0 25px rgba(255,255,255,0.6);
 }
 
 /* QUOTE */
@@ -98,6 +97,47 @@ button:hover {
     z-index: 4;
     white-space: nowrap;
     transition: opacity 1.5s ease, transform 1.5s ease;
+}
+
+/* IMAGE OVERLAY */
+#imgOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 1s ease;
+    background: rgba(0,0,0,0.3);
+}
+
+#imgOverlay img {
+    position: absolute;
+    width: 80%;
+    max-width: 360px;
+    border-radius: 18px;
+    opacity: 0;
+    transform: scale(1.05);
+    transition: opacity 1s ease, transform 1s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* FINAL SCREEN */
+#finalScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: clamp(18px, 5vw, 28px);
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 2s ease;
+    text-align: center;
 }
 
 /* MOBILE */
@@ -129,8 +169,14 @@ button:hover {
 <!-- QUOTE -->
 <div id="quote">Where it Began...</div>
 
+<!-- IMAGE OVERLAY -->
+<div id="imgOverlay"></div>
+
+<!-- FINAL -->
+<div id="finalScreen">Everything began here...</div>
+
 <script>
-/* ---------------- PARTICLES ---------------- */
+/* PARTICLES */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
@@ -169,41 +215,86 @@ function drawParticles() {
         }
     });
 }
-
 setInterval(drawParticles, 33);
 
-/* ---------------- EXPERIENCE FLOW ---------------- */
+/* IMAGES */
+const overlay = document.getElementById("imgOverlay");
+
+const images = ["img1.jpg", "img2.jpg", "img3.jpg"];
+
+let imgElements = images.map(src => {
+    let img = document.createElement("img");
+    img.src = src;
+    overlay.appendChild(img);
+    return img;
+});
+
+/* EXPERIENCE */
 function startExperience() {
     const container = document.querySelector('.container');
     const video = document.getElementById('video');
     const quote = document.getElementById('quote');
+    const finalScreen = document.getElementById('finalScreen');
 
     container.style.opacity = "0";
 
-    // Show quote first
+    /* quote */
     setTimeout(() => {
         quote.style.opacity = "1";
         quote.style.transform = "translate(-50%, -50%) scale(1)";
     }, 500);
 
-    // Start video slightly BEFORE quote fades
+    /* start video early */
     setTimeout(() => {
         video.muted = true;
         video.currentTime = 0;
         video.play();
     }, 1800);
 
-    // Fade quote + reveal video clarity
+    /* reveal clarity + start image sequence */
     setTimeout(() => {
         quote.style.opacity = "0";
-        quote.style.transform = "translate(-50%, -50%) scale(0.95)";
 
         video.style.filter = "brightness(1) blur(0px)";
         video.style.transform = "scale(1)";
     }, 2500);
+
+    /* IMAGE SEQUENCE near end */
+    video.ontimeupdate = () => {
+        const t = video.currentTime;
+        const end = video.duration;
+
+        if (end - t <= 3 && !window.imgStarted) {
+            window.imgStarted = true;
+
+            overlay.style.opacity = "1";
+
+            setTimeout(() => {
+                imgElements[0].style.opacity = "1";
+            }, 0);
+
+            setTimeout(() => {
+                imgElements[0].style.opacity = "0";
+                imgElements[1].style.opacity = "1";
+            }, 900);
+
+            setTimeout(() => {
+                imgElements[1].style.opacity = "0";
+                imgElements[2].style.opacity = "1";
+            }, 1800);
+        }
+
+        /* FINAL END */
+        if (end - t <= 0.5 && !window.done) {
+            window.done = true;
+
+            overlay.style.opacity = "0";
+            finalScreen.style.opacity = "1";
+            video.style.opacity = "0";
+        }
+    };
 }
 
-/* ---------------- RESIZE ---------------- */
 window.addEventListener("resize", resizeCanvas);
 </script>
 
