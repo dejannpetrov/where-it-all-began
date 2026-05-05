@@ -18,7 +18,7 @@ body {
     overflow: hidden;
 }
 
-/* VIDEO */
+/* VIDEO BACKGROUND */
 #videoContainer {
     position: fixed;
     inset: 0;
@@ -31,7 +31,7 @@ video {
     object-fit: cover;
     filter: brightness(0.4) blur(6px);
     transform: scale(1.05);
-    transition: 1.5s ease;
+    transition: filter 2s ease, transform 2s ease;
 }
 
 /* PARTICLES */
@@ -41,35 +41,47 @@ canvas {
     z-index: 2;
 }
 
-/* UI */
+/* MAIN CONTENT */
 .container {
     position: relative;
     z-index: 3;
     height: 100vh;
+    padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: white;
+    flex-direction: column;
     text-align: center;
-    transition: opacity 0.6s ease;
+    color: white;
+    transition: opacity 0.8s ease;
 }
 
 h1 {
     font-weight: 300;
     letter-spacing: 2px;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
+    opacity: 0.85;
     font-size: clamp(20px, 5vw, 28px);
 }
 
 /* BUTTON */
 button {
-    padding: 16px 40px;
-    border-radius: 999px;
+    padding: 16px 42px;
+    font-size: 15px;
+    letter-spacing: 1px;
     border: 1px solid rgba(255,255,255,0.8);
     background: rgba(255,255,255,0.08);
     color: white;
-    font-size: 15px;
+    cursor: pointer;
+    border-radius: 999px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: white;
+    color: black;
+    box-shadow: 0 0 25px rgba(255,255,255,0.6);
 }
 
 /* QUOTE */
@@ -77,134 +89,122 @@ button {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(0.95);
     font-size: clamp(18px, 5vw, 28px);
+    letter-spacing: 2px;
+    font-style: italic;
     color: white;
     opacity: 0;
     z-index: 4;
     white-space: nowrap;
-    transition: opacity 1s ease;
+    transition: opacity 1.5s ease, transform 1.5s ease;
 }
 
-/* FINAL */
-#final {
-    position: fixed;
-    inset: 0;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 22px;
-    opacity: 0;
-    z-index: 10;
-    transition: opacity 1.5s ease;
+/* MOBILE */
+@media (max-width: 480px) {
+    button {
+        padding: 14px 32px;
+        font-size: 14px;
+    }
 }
 </style>
 </head>
 
 <body>
 
+<!-- VIDEO -->
 <div id="videoContainer">
-    <video id="video" src="zoom1.mp4" playsinline preload="auto"></video>
+    <video id="video" src="zoom1.mp4" playsinline></video>
 </div>
 
+<!-- PARTICLES -->
 <canvas id="particles"></canvas>
 
+<!-- MAIN -->
 <div class="container">
     <h1>A Place Worth Remembering</h1>
-    <button onclick="start()">Begin</button>
+    <button onclick="startExperience()">Begin</button>
 </div>
 
+<!-- QUOTE -->
 <div id="quote">Where it Began...</div>
-<div id="final">Everything began here...</div>
 
 <script>
-
-/* SIMPLE PARTICLES */
+/* ---------------- PARTICLES ---------------- */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
-function resize(){
+function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
-resize();
+resizeCanvas();
 
-let p = [];
-for(let i=0;i<50;i++){
-    p.push({
-        x:Math.random()*canvas.width,
-        y:Math.random()*canvas.height,
-        r:Math.random()*2,
-        d:Math.random()*0.5
+let particles = [];
+for (let i = 0; i < 60; i++) {
+    particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2,
+        d: Math.random() * 0.6
     });
 }
 
-function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle="white";
-    ctx.globalAlpha=0.4;
+function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.globalAlpha = 0.4;
 
-    p.forEach(s=>{
+    particles.forEach(p => {
         ctx.beginPath();
-        ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
-        s.y+=s.d;
-        if(s.y>canvas.height){
-            s.y=0;
-            s.x=Math.random()*canvas.width;
+    });
+
+    particles.forEach(p => {
+        p.y += p.d;
+        if (p.y > canvas.height) {
+            p.y = 0;
+            p.x = Math.random() * canvas.width;
         }
     });
 }
-setInterval(draw,33);
 
-/* MAIN FIXED FLOW */
-function start(){
+setInterval(drawParticles, 33);
 
-    const container = document.querySelector(".container");
-    const video = document.getElementById("video");
-    const quote = document.getElementById("quote");
-    const final = document.getElementById("final");
+/* ---------------- EXPERIENCE FLOW ---------------- */
+function startExperience() {
+    const container = document.querySelector('.container');
+    const video = document.getElementById('video');
+    const quote = document.getElementById('quote');
 
     container.style.opacity = "0";
 
-    // IMPORTANT: play must happen IMMEDIATELY on click
-    video.muted = true;
-    video.currentTime = 0;
-
-    let playPromise = video.play();
-
-    if(playPromise !== undefined){
-        playPromise.catch(err=>{
-            console.log("Play blocked:", err);
-        });
-    }
-
-    // quote
-    setTimeout(()=>{
+    // Show quote first
+    setTimeout(() => {
         quote.style.opacity = "1";
-    },300);
+        quote.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 500);
 
-    // clear video
-    setTimeout(()=>{
+    // Start video slightly BEFORE quote fades
+    setTimeout(() => {
+        video.muted = true;
+        video.currentTime = 0;
+        video.play();
+    }, 1800);
+
+    // Fade quote + reveal video clarity
+    setTimeout(() => {
         quote.style.opacity = "0";
+        quote.style.transform = "translate(-50%, -50%) scale(0.95)";
+
         video.style.filter = "brightness(1) blur(0px)";
         video.style.transform = "scale(1)";
-    },1800);
-
-    // end screen
-    video.addEventListener("timeupdate",()=>{
-        if(video.duration && video.currentTime > video.duration - 0.5){
-            final.style.opacity = "1";
-            video.style.opacity = "0";
-        }
-    });
-
+    }, 2500);
 }
 
-window.addEventListener("resize",resize);
-
+/* ---------------- RESIZE ---------------- */
+window.addEventListener("resize", resizeCanvas);
 </script>
 
 </body>
