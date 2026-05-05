@@ -38,7 +38,7 @@ canvas {
     align-items: center;
     flex-direction: column;
     text-align: center;
-    transition: opacity 1s ease;
+    transition: opacity 0.8s ease;
 }
 
 /* TITLE */
@@ -95,16 +95,15 @@ video {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    letter-spacing: 3px;
-    white-space: nowrap;
+    transform: translate(-50%, -50%) scale(0.95);
     font-size: clamp(18px, 5vw, 28px);
+    letter-spacing: 2px;
     font-style: italic;
     opacity: 0;
     z-index: 6;
-    transition: opacity 2s ease;
     text-align: center;
-    padding: 0 20px;
+    white-space: nowrap;
+    transition: opacity 1.5s ease, transform 1.5s ease;
 }
 
 /* MOBILE */
@@ -137,6 +136,7 @@ video {
 <div id="quote">Where it Began...</div>
 
 <script>
+/* PARTICLES */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
@@ -178,6 +178,7 @@ function drawParticles() {
 
 setInterval(drawParticles, 33);
 
+/* EXPERIENCE FLOW */
 function startExperience() {
     const container = document.querySelector('.container');
     const videoContainer = document.getElementById('videoContainer');
@@ -186,31 +187,25 @@ function startExperience() {
 
     container.style.opacity = "0";
 
-    // Show quote first
+    // STEP 1: show quote
     setTimeout(() => {
         quote.style.opacity = "1";
-    }, 600);
+        quote.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 500);
 
-    // Then start video after a short pause
+    // STEP 2: hide quote
     setTimeout(() => {
         quote.style.opacity = "0";
+        quote.style.transform = "translate(-50%, -50%) scale(0.95)";
+    }, 2600);
 
+    // STEP 3: show video
+    setTimeout(() => {
         videoContainer.style.display = "flex";
         videoContainer.style.opacity = "1";
-
         video.muted = true;
         video.play();
-    }, 2500);
-}
-
-    video.onended = () => {
-        videoContainer.style.opacity = "0";
-
-        setTimeout(() => {
-            videoContainer.style.display = "none";
-            document.getElementById('quote').style.opacity = "1";
-        }, 1200);
-    };
+    }, 3200);
 }
 
 window.addEventListener("resize", resizeCanvas);
