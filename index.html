@@ -178,25 +178,29 @@ function startExperience() {
     const video = document.getElementById('video');
     const quote = document.getElementById('quote');
 
-    // Start video instantly
-    video.muted = true;
-    video.play();
-
-    // Hide landing
     container.style.opacity = "0";
 
-    // Show quote
+    // 1. show quote
     setTimeout(() => {
         quote.style.opacity = "1";
         quote.style.transform = "translate(-50%, -50%) scale(1)";
-    }, 600);
+    }, 500);
 
-    // Reveal video clarity
+    // 2. START VIDEO slightly BEFORE quote fades out
+    setTimeout(() => {
+        video.muted = true;
+        video.play();
+    }, 2000); // 👈 starts early
+
+    // 3. fade quote + reveal video clarity
     setTimeout(() => {
         quote.style.opacity = "0";
+        quote.style.transform = "translate(-50%, -50%) scale(0.95)";
+
         video.style.filter = "brightness(1) blur(0px)";
         video.style.transform = "scale(1)";
-    }, 2600);
+    }, 2500); // 👈 this is your “Where it Began…” fade moment
+}
 }
 
 /* RESIZE */
