@@ -41,7 +41,7 @@ canvas {
     z-index: 2;
 }
 
-/* MAIN */
+/* UI */
 .container {
     position: relative;
     z-index: 3;
@@ -70,11 +70,6 @@ button {
     background: rgba(255,255,255,0.08);
     color: white;
     font-size: 15px;
-    cursor: pointer;
-}
-
-button:active {
-    transform: scale(0.98);
 }
 
 /* QUOTE */
@@ -102,7 +97,7 @@ button:active {
     color: white;
     font-size: 22px;
     opacity: 0;
-    z-index: 20;
+    z-index: 10;
     transition: opacity 1.5s ease;
 }
 </style>
@@ -112,13 +107,13 @@ button:active {
 
 <!-- VIDEO -->
 <div id="videoContainer">
-    <video id="video" src="zoom1.mp4" playsinline></video>
+    <video id="video" src="zoom1.mp4" playsinline preload="auto"></video>
 </div>
 
 <!-- PARTICLES -->
 <canvas id="particles"></canvas>
 
-<!-- MAIN -->
+<!-- UI -->
 <div class="container">
     <h1>A Place Worth Remembering</h1>
     <button id="startBtn">Begin</button>
@@ -143,7 +138,8 @@ function resize() {
 resize();
 
 let particles = [];
-for (let i = 0; i < 50; i++) {
+
+for (let i = 0; i < 60; i++) {
     particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
@@ -163,7 +159,7 @@ function draw() {
         ctx.fill();
 
         p.y += p.d;
-        if(p.y > canvas.height){
+        if (p.y > canvas.height) {
             p.y = 0;
             p.x = Math.random()*canvas.width;
         }
@@ -171,48 +167,56 @@ function draw() {
 }
 setInterval(draw, 33);
 
-/* ---------------- MAIN FLOW ---------------- */
+/* ---------------- STORY FLOW ---------------- */
 
 const btn = document.getElementById("startBtn");
 
-btn.addEventListener("click", () => {
-    start();
-});
+btn.addEventListener("pointerdown", startStory); // IMPORTANT FIX
 
-function start() {
+function startStory() {
+
     const container = document.querySelector(".container");
     const video = document.getElementById("video");
     const quote = document.getElementById("quote");
     const final = document.getElementById("final");
 
-    // hide main
+    // hide UI immediately
     container.style.opacity = "0";
+
+    // reset video safely
+    video.currentTime = 0;
+    video.muted = true;
+
+    // FORCE LOAD VIDEO FIRST (fix iPhone issue)
+    video.load();
 
     // show quote
     setTimeout(() => {
         quote.style.opacity = "1";
     }, 500);
 
-    // start video (SAFE delayed start)
+    // start video reliably
     setTimeout(() => {
-        video.muted = true;
-        video.currentTime = 0;
+        let playPromise = video.play();
 
-        video.play().catch(err => {
-            console.log("Video blocked, retrying...");
-        });
-    }, 1200);
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                console.log("Autoplay blocked, retrying...");
+                video.play();
+            });
+        }
+    }, 900);
 
-    // reveal video clarity
+    // clear cinematic look
     setTimeout(() => {
         quote.style.opacity = "0";
         video.style.filter = "brightness(1) blur(0px)";
         video.style.transform = "scale(1)";
-    }, 2200);
+    }, 2000);
 
-    // final ending
+    // end screen
     video.addEventListener("timeupdate", () => {
-        if (video.duration && video.currentTime > video.duration - 0.5) {
+        if (video.duration && video.currentTime > video.duration - 0.4) {
             final.style.opacity = "1";
             video.style.opacity = "0";
         }
