@@ -3,170 +3,193 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wedding</title>
+<title>The Beginning</title>
 
 <style>
-body {
-  margin: 0;
-  background: #0f0f0f;
-  font-family: Arial, sans-serif;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Helvetica Neue', sans-serif;
+    }
 
-/* BUTTON */
-.open-btn {
-  padding: 14px 28px;
-  border: none;
-  border-radius: 30px;
-  background: #c9a96e;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-  
-.watch-btn {
-  padding: 14px 28px;
-  border: none;
-  border-radius: 30px;
-  background: #c9a96e;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
+    body {
+        background: #0a0a0a;
+        color: white;
+        overflow: hidden;
+    }
 
-/* OVERLAY */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-}
+    /* PARTICLE CANVAS */
+    canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 0;
+    }
 
-/* ACTIVE STATE */
-.overlay.active {
-  opacity: 1;
-  pointer-events: all;
-}
+    /* LANDING CONTENT */
+    .container {
+        position: relative;
+        z-index: 2;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+    }
 
-/* VIDEO CONTAINER */
-.modal {
-  width: 90%;
-  max-width: 500px;
-  transform: scale(0.8);
-  opacity: 0;
-  transition: all 0.4s ease;
-}
+    h1 {
+        font-weight: 300;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        opacity: 0.8;
+    }
 
-/* ANIMATE IN */
-.overlay.active .modal {
-  transform: scale(1);
-  opacity: 1;
-}
+    button {
+        padding: 15px 40px;
+        font-size: 16px;
+        border: 1px solid white;
+        background: transparent;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
 
-/* VIDEO */
-video {
-  width: 100%;
-  border-radius: 15px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-}
-  
+    button:hover {
+        background: white;
+        color: black;
+    }
 
-/* CLOSE AREA (click outside) */
-.overlay::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-  
-/* OVERLAY */
-.video-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    /* VIDEO FULLSCREEN */
+    #videoContainer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: black;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 5;
+        opacity: 0;
+        transition: opacity 1s ease;
+    }
 
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
-}
+    video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
-.video-overlay.active {
-  opacity: 1;
-  pointer-events: all;
-}
+    /* QUOTE */
+    #quote {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 28px;
+        letter-spacing: 2px;
+        opacity: 0;
+        z-index: 6;
+        transition: opacity 2s ease;
+    }
 
-/* MODAL */
-.video-modal {
-  width: 90%;
-  max-width: 500px;
-
-  transform: scale(0.9);
-  opacity: 0;
-  transition: all 0.35s ease;
-}
-
-.video-overlay.active .video-modal {
-  transform: scale(1);
-  opacity: 1;
-}
-
-/* VIDEO */
-video {
-  width: 100%;
-  border-radius: 15px;
-  background: black;
-}
-
-/* REMOVE default controls UI */
-video::-webkit-media-controls {
-  display: none !important;
-}
 </style>
 </head>
 
 <body>
-    <!-- BUTTON -->
-<button onclick="openVideo()" class="watch-btn">
-  Watch Our Moment
-</button>
 
-<!-- VIDEO POPUP -->
-<div id="videoOverlay" class="video-overlay">
-  <div class="video-modal" onclick="event.stopPropagation()">
-    <video id="weddingVideo" playsinline preload="auto">
-      <source src="zoom1.mp4" type="video/mp4">
-    </video>
-  </div>
+<canvas id="particles"></canvas>
+
+<div class="container">
+    <h1>A Place Worth Remembering</h1>
+    <button onclick="startExperience()">Open the Moment</button>
+</div>
+
+<div id="videoContainer">
+    <video id="video" src="your-zoom1.mp4" playsinline></video>
+</div>
+
+<div id="quote">Where it Began...</div>
 
 <script>
-const overlay = document.getElementById("overlay");
-const video = document.getElementById("video");
+/* PARTICLES */
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
 
-function openVideo() {
-  overlay.classList.add("active");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-  // small delay so animation feels smooth
-  setTimeout(() => {
-    video.play().catch(() => {});
-  }, 200);
+let particles = [];
+
+for (let i = 0; i < 80; i++) {
+    particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2,
+        d: Math.random() * 1
+    });
 }
 
-function closeVideo() {
-  overlay.classList.remove("active");
-  video.pause();
-  video.currentTime = 0;
+function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.globalAlpha = 0.5;
+
+    particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    updateParticles();
 }
+
+function updateParticles() {
+    particles.forEach(p => {
+        p.y += p.d;
+        if (p.y > canvas.height) {
+            p.y = 0;
+            p.x = Math.random() * canvas.width;
+        }
+    });
+}
+
+setInterval(drawParticles, 33);
+
+/* EXPERIENCE FLOW */
+function startExperience() {
+    const container = document.querySelector('.container');
+    const videoContainer = document.getElementById('videoContainer');
+    const video = document.getElementById('video');
+
+    container.style.opacity = "0";
+
+    setTimeout(() => {
+        videoContainer.style.display = "flex";
+        videoContainer.style.opacity = "1";
+
+        video.play(); // autoplay without controls
+
+    }, 1000);
+
+    video.onended = () => {
+        videoContainer.style.opacity = "0";
+
+        setTimeout(() => {
+            videoContainer.style.display = "none";
+            document.getElementById('quote').style.opacity = "1";
+        }, 1500);
+    };
+}
+
+/* RESIZE FIX */
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
 </script>
 
 </body>
