@@ -187,6 +187,7 @@ function startExperience() {
     // Start video slightly BEFORE quote fades
     setTimeout(() => {
         video.muted = false;
+        video.volume = 1;
         video.currentTime = 0;
         video.play();
     }, 1800);
