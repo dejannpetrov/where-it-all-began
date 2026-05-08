@@ -14,7 +14,7 @@
   box-sizing: border-box;
 }
 
-/* BASE */
+/* BACKGROUND */
 body {
   height: 100vh;
   overflow: hidden;
@@ -23,15 +23,17 @@ body {
   font-family: Inter, sans-serif;
 }
 
-/* PARTICLES */
-  canvas {
+/* 🔥 PARTICLES ALWAYS ON TOP */
+canvas {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 0;
-  opacity: 0.9; /* balanced visibility */
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.85;
 }
-
 
 /* INTRO */
 #intro {
@@ -50,17 +52,15 @@ body {
 }
 
 /* TITLE */
-
 h1 {
   font-family: "Playfair Display", serif;
   font-weight: 400;
   font-size: 28px;
   letter-spacing: 1.2px;
   opacity: 0.95;
-  margin-bottom: 30px;
 
-  white-space: nowrap;      /* 🔥 forces one line */
-  text-align: center;
+  white-space: nowrap;
+  margin-bottom: 30px;
 }
 
 /* BUTTON */
@@ -75,19 +75,17 @@ button {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* hover glow */
 button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 20px rgba(255,255,255,0.4);
 }
 
-/* click flash */
 button:active {
   box-shadow: 0 0 35px rgba(255,255,255,0.9);
   transform: scale(0.98);
 }
 
-/* VIDEO */
+/* VIDEO LAYER */
 #videoContainer {
   position: fixed;
   top: 50%;
@@ -108,11 +106,7 @@ video {
   filter: blur(6px) brightness(0.75);
   transition: filter 2s ease;
 }
-@media (max-width: 420px) {
-  h1 {
-    font-size: 22px;
-  }
-}
+
 #videoContainer.active {
   width: 100%;
   height: 100%;
@@ -120,11 +114,16 @@ video {
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
 }
-  
-  
 
 #videoContainer.active video {
   filter: blur(0px) brightness(1);
+}
+
+/* mobile fix */
+@media (max-width: 420px) {
+  h1 {
+    font-size: 22px;
+  }
 }
 </style>
 </head>
@@ -135,7 +134,7 @@ video {
 
 <!-- INTRO -->
 <div id="intro">
-  <h1>The Place Worth Remembering...</h1> <!-- ✨ added dots -->
+  <h1>The Place Worth Remembering...</h1>
   <button onclick="startVideo()">Relieve the Moment</button>
 </div>
 
@@ -159,7 +158,7 @@ function startVideo() {
   }, 800);
 }
 
-// PARTICLES (brighter + more visible)
+// PARTICLES (WHITE CINEMATIC FLOATING DUST)
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
@@ -168,7 +167,7 @@ canvas.height = window.innerHeight;
 
 let particles = [];
 
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 110; i++) {
   particles.push({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
@@ -176,26 +175,27 @@ for (let i = 0; i < 100; i++) {
     d: Math.random() * 1.4
   });
 }
+
 function drawParticles() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   particles.forEach(p => {
 
-    // stronger soft white glow (no harsh colors)
-    const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 10);
+    const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 12);
 
-    glow.addColorStop(0, "rgba(255,255,255,1)");       // pure white center
-    glow.addColorStop(0.4, "rgba(255,255,255,0.35)");  // soft fade
+    glow.addColorStop(0, "rgba(255,255,255,1)");
+    glow.addColorStop(0.3, "rgba(255,255,255,0.5)");
     glow.addColorStop(1, "rgba(255,255,255,0)");
 
     ctx.fillStyle = glow;
 
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r * 2.8, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
     ctx.fill();
 
-    // movement
+    // smooth floating motion
     p.y -= p.d;
+    p.x += Math.sin(p.y * 0.01) * 0.3;
 
     if (p.y < 0) {
       p.y = canvas.height;
@@ -206,11 +206,9 @@ function drawParticles() {
   requestAnimationFrame(drawParticles);
 }
 
-  requestAnimationFrame(drawParticles);
-}
-
 drawParticles();
 
+// resize fix
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
