@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-<title>Our Moment</title>
+<title>A Place Worth Remembering</title>
 
 <style>
 
@@ -20,9 +20,10 @@ body{
 
   overflow:hidden;
 
-  background:#000;
+  background:
+  radial-gradient(circle at top, #1b1b1b 0%, #000 70%);
 
-  font-family:Arial,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
 
   display:flex;
   justify-content:center;
@@ -31,42 +32,51 @@ body{
 
 /* BUTTON */
 
-.watch-btn{
+.relive-btn{
+
   padding:16px 34px;
 
   border:none;
 
   border-radius:999px;
 
-  background:rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.08);
 
   color:white;
 
   font-size:16px;
 
-  letter-spacing:0.5px;
+  letter-spacing:1px;
 
   backdrop-filter:blur(10px);
 
   -webkit-backdrop-filter:blur(10px);
+
+  box-shadow:
+  0 10px 30px rgba(0,0,0,0.35);
 
   cursor:pointer;
 
   transition:0.3s ease;
 }
 
-.watch-btn:active{
-  transform:scale(0.97);
+.relive-btn:active{
+  transform:scale(0.96);
 }
 
 /* OVERLAY */
 
 .video-overlay{
+
   position:fixed;
 
   inset:0;
 
-  background:rgba(0,0,0,0.92);
+  background:rgba(0,0,0,0.88);
+
+  backdrop-filter:blur(10px);
+
+  -webkit-backdrop-filter:blur(10px);
 
   display:flex;
 
@@ -85,17 +95,16 @@ body{
 
 .video-overlay.active{
   opacity:1;
-
   pointer-events:auto;
 }
 
 /* VIDEO HOLDER */
 
-.video-modal{
+.video-wrap{
 
-  width:90vw;
+  width:100vw;
 
-  height:90vh;
+  height:100vh;
 
   display:flex;
 
@@ -103,46 +112,49 @@ body{
 
   align-items:center;
 
-  padding:24px;
+  padding:18px;
 }
 
 /* VIDEO */
 
-.video-modal video{
+.video-wrap video{
 
-  width:100%;
+  width:94vw;
 
-  max-width:430px;
+  max-width:520px;
 
-  aspect-ratio:16/9;
+  height:72vh;
 
   object-fit:cover;
 
-  border-radius:24px;
+  border-radius:28px;
 
   background:black;
 
   box-shadow:
-  0 25px 80px rgba(0,0,0,0.65);
-
-  transform:scale(0.985);
+  0 25px 80px rgba(0,0,0,0.7);
 
   opacity:0;
+
+  transform:
+  scale(0.965);
 
   transition:
   opacity 0.45s ease,
   transform 0.45s ease;
 }
 
-/* SHOW VIDEO */
+/* SHOW */
 
 .video-overlay.active video{
+
   opacity:1;
 
-  transform:scale(1);
+  transform:
+  scale(1);
 }
 
-/* REMOVE IOS VIDEO UI */
+/* REMOVE IOS CONTROLS */
 
 video::-webkit-media-controls{
   display:none !important;
@@ -153,19 +165,20 @@ video::-webkit-media-controls{
 
 <body>
 
-<button class="watch-btn" onclick="openVideo()">
-  Watch Our Moment
+<button class="relive-btn" onclick="openVideo()">
+  Relive the Moment
 </button>
 
 <div class="video-overlay" id="videoOverlay">
 
-  <div class="video-modal" onclick="event.stopPropagation()">
+  <div class="video-wrap" onclick="event.stopPropagation()">
 
     <video
       id="proposalVideo"
       playsinline
       preload="auto">
 
+      <!-- REPLACE VIDEO HERE -->
       <source src="zoomnpin.mp4" type="video/mp4">
 
     </video>
@@ -176,8 +189,13 @@ video::-webkit-media-controls{
 
 <script>
 
-const overlay = document.getElementById("videoOverlay");
-const video = document.getElementById("proposalVideo");
+const overlay =
+document.getElementById("videoOverlay");
+
+const video =
+document.getElementById("proposalVideo");
+
+/* OPEN */
 
 function openVideo(){
 
@@ -186,13 +204,14 @@ function openVideo(){
   video.currentTime = 0;
 
   video.muted = false;
+
   video.volume = 1;
 
   video.play().catch(() => {});
 
 }
 
-/* CLOSE WHEN CLICK OUTSIDE */
+/* CLOSE */
 
 overlay.addEventListener("click", () => {
 
