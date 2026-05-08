@@ -281,25 +281,30 @@ const btn = document.getElementById('startBtn');
 const video = document.getElementById('bgVideo');
 const popup = document.getElementById('popup');
 
-btn.addEventListener('click', async () => {
-
-    try{
+    btn.addEventListener('click', async () => {
+    try {
+        video.load();
+        video.muted = true; // required for initial start on iOS
 
         await video.play();
+
+        // now try to unmute AFTER it starts (optional)
+        setTimeout(() => {
+            video.muted = false;
+        }, 1000);
 
         video.style.opacity = "1";
 
         btn.style.opacity = "0";
         btn.style.pointerEvents = "none";
 
-        setTimeout(() => {
-            popup.classList.add('show');
-        }, 900);
+        setTimeout(() => popup.classList.add('show'), 900);
 
-    }catch(err){
-        console.log(err);
+    } catch (err) {
+        console.log("Playback failed:", err);
     }
 });
+    
 </script>
 
 </body>
