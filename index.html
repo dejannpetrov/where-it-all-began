@@ -32,7 +32,7 @@ canvas {
   height: 100%;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.45;
+  opacity: 0.6;
   filter: blur(0.3px);
 }
 
@@ -168,7 +168,7 @@ canvas.height = window.innerHeight;
 
 let particles = [];
 
-for (let i = 0; i < 110; i++) {
+for (let i = 0; i < 65; i++) {
   particles.push({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
@@ -184,8 +184,8 @@ function drawParticles() {
 
     const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 12);
 
-    glow.addColorStop(0, "rgba(255,255,255,1)");
-    glow.addColorStop(0.3, "rgba(255,255,255,0.5)");
+    glow.addColorStop(0, "rgba(255,255,255,0.8)");
+    glow.addColorStop(0.3, "rgba(255,255,255,0.25)");
     glow.addColorStop(1, "rgba(255,255,255,0)");
 
     ctx.fillStyle = glow;
