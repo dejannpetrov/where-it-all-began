@@ -2,309 +2,194 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>A Place Worth Remembering</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Memory Proposal</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, sans-serif;
 }
 
-html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:black;
-    font-family:'Inter',sans-serif;
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: #0b0f1a;
+  color: white;
 }
 
-/* VIDEO */
-
-.video-container{
-    position:fixed;
-    inset:0;
-    overflow:hidden;
-    z-index:-3;
+/* Particle canvas */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
 }
 
-video{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%) scale(1.08);
-    min-width:100%;
-    min-height:100%;
-    width:auto;
-    height:auto;
-    object-fit:cover;
-    opacity:0;
-    transition:opacity 2.5s ease;
-    filter:brightness(0.55);
+/* Intro screen */
+#intro {
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  transition: opacity 1.5s ease;
 }
 
-/* MOBILE FIX FOR 1920x1080 VIDEO */
-
-@media (max-width:768px){
-    video{
-        height:100%;
-        width:auto;
-        transform:translate(-50%,-50%) scale(1.15);
-    }
+h1 {
+  font-weight: 400;
+  margin-bottom: 20px;
+  opacity: 0.9;
 }
 
-/* OVERLAY */
-
-.overlay{
-    position:fixed;
-    inset:0;
-    background:linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.45),
-        rgba(0,0,0,0.72)
-    );
-    z-index:-2;
+input {
+  width: 80%;
+  max-width: 320px;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  text-align: center;
 }
 
-/* PARTICLES */
-
-#particles{
-    position:fixed;
-    inset:0;
-    z-index:-1;
-    overflow:hidden;
+button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: none;
+  background: white;
+  color: black;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
-.particle{
-    position:absolute;
-    width:3px;
-    height:3px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.5);
-    animation:float linear infinite;
+button:hover {
+  transform: scale(1.05);
 }
 
-@keyframes float{
-    from{
-        transform:translateY(100vh);
-        opacity:0;
-    }
-    20%{
-        opacity:1;
-    }
-    to{
-        transform:translateY(-10vh);
-        opacity:0;
-    }
+/* Video layer */
+#videoContainer {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 45%;
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  z-index: 1;
+  transition: all 2s ease-in-out;
 }
 
-/* CONTENT */
-
-.content{
-    position:relative;
-    width:100%;
-    height:100%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    text-align:center;
-    padding:20px;
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+  filter: blur(6px) brightness(0.8);
+  transition: filter 2s ease;
 }
 
-.title{
-    font-family:'Cormorant Garamond',serif;
-    font-size:clamp(42px,8vw,90px);
-    color:white;
-    font-weight:300;
-    letter-spacing:1px;
-    opacity:0;
-    transform:translateY(20px);
-    animation:titleReveal 2s ease forwards;
-    text-shadow:0 0 25px rgba(255,255,255,0.12);
+#videoContainer.active {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
 }
 
-@keyframes titleReveal{
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-.subtitle{
-    margin-top:18px;
-    color:rgba(255,255,255,0.75);
-    font-size:14px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    opacity:0;
-    animation:fadeIn 2s ease forwards;
-    animation-delay:1s;
-}
-
-@keyframes fadeIn{
-    to{
-        opacity:1;
-    }
-}
-
-/* BUTTON */
-
-.play-btn{
-    margin-top:45px;
-    padding:15px 42px;
-    border:none;
-    border-radius:60px;
-    background:rgba(255,255,255,0.1);
-    backdrop-filter:blur(12px);
-    color:white;
-    font-size:15px;
-    letter-spacing:1px;
-    cursor:pointer;
-    overflow:hidden;
-    position:relative;
-    transition:all .35s ease;
-    opacity:0;
-    animation:fadeIn 2s ease forwards;
-    animation-delay:1.5s;
-}
-
-.play-btn:hover{
-    transform:scale(1.05);
-    background:rgba(255,255,255,0.18);
-}
-
-.play-btn::before{
-    content:'';
-    position:absolute;
-    top:-120%;
-    left:-30%;
-    width:50%;
-    height:300%;
-    background:rgba(255,255,255,0.35);
-    transform:rotate(25deg);
-    transition:.7s;
-}
-
-.play-btn:hover::before{
-    left:120%;
-}
-
-/* POPUP */
-
-.popup{
-    position:fixed;
-    bottom:40px;
-    left:50%;
-    transform:translateX(-50%) translateY(30px);
-    background:rgba(15,15,15,0.78);
-    color:white;
-    padding:16px 28px;
-    border-radius:20px;
-    backdrop-filter:blur(12px);
-    font-size:14px;
-    letter-spacing:1px;
-    opacity:0;
-    transition:1.5s ease;
-    border:1px solid rgba(255,255,255,0.08);
-}
-
-.popup.show{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
+#videoContainer.active video {
+  filter: blur(0px) brightness(1);
 }
 </style>
 </head>
 
 <body>
 
-<div class="video-container">
-    <!-- REPLACE video.mp4 WITH YOUR VIDEO -->
-    <video id="bgVideo" playsinline>
-        <source src="zoomnpin.mp4" type="video/mp4">
-    </video>
+<canvas id="particles"></canvas>
+
+<!-- INTRO -->
+<div id="intro">
+  <h1>Where did it begin?</h1>
+  <input placeholder="Enter a place to remember..." />
+  <input placeholder="Another memory..." />
+  <button onclick="startVideo()">Relieve the Moment</button>
 </div>
 
-<div class="overlay"></div>
-
-<div id="particles"></div>
-
-<div class="content">
-    <h1 class="title">A place worth remembering</h1>
-
-    <div class="subtitle">
-        Every memory starts somewhere
-    </div>
-
-    <button class="play-btn" id="startBtn">
-        Begin the journey
-    </button>
-</div>
-
-<div class="popup" id="popup">
-    where it began…
+<!-- VIDEO -->
+<div id="videoContainer">
+  <video id="bgVideo" src="zoomnpin.mp4" playsinline></video>
 </div>
 
 <script>
-// PARTICLES
+// ---------------- VIDEO START ----------------
+function startVideo() {
+  document.getElementById("intro").style.opacity = "0";
 
-const particles = document.getElementById('particles');
+  const videoContainer = document.getElementById("videoContainer");
+  const video = document.getElementById("bgVideo");
 
-for(let i = 0; i < 65; i++){
-
-    const p = document.createElement('div');
-    p.classList.add('particle');
-
-    const size = Math.random() * 3 + 1;
-
-    p.style.width = size + 'px';
-    p.style.height = size + 'px';
-
-    p.style.left = Math.random() * 100 + 'vw';
-
-    p.style.animationDuration = (Math.random() * 18 + 12) + 's';
-
-    p.style.animationDelay = Math.random() * 8 + 's';
-
-    p.style.opacity = Math.random();
-
-    particles.appendChild(p);
+  setTimeout(() => {
+    videoContainer.classList.add("active");
+    video.play();
+  }, 800);
 }
 
-// VIDEO START
+// ---------------- PARTICLES ----------------
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
 
-const btn = document.getElementById('startBtn');
-const video = document.getElementById('bgVideo');
-const popup = document.getElementById('popup');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-    btn.addEventListener('click', async () => {
-    try {
-        video.load();
-        video.muted = true; // required for initial start on iOS
+let particles = [];
 
-        await video.play();
+for (let i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2 + 1,
+    d: Math.random() * 1
+  });
+}
 
-        // now try to unmute AFTER it starts (optional)
-        setTimeout(() => {
-            video.muted = false;
-        }, 1000);
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "rgba(255,255,255,0.6)";
 
-        video.style.opacity = "1";
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, false);
+    ctx.fill();
 
-        btn.style.opacity = "0";
-        btn.style.pointerEvents = "none";
-
-        setTimeout(() => popup.classList.add('show'), 900);
-
-    } catch (err) {
-        console.log("Playback failed:", err);
+    p.y -= p.d;
+    if (p.y < 0) {
+      p.y = canvas.height;
+      p.x = Math.random() * canvas.width;
     }
+  });
+
+  requestAnimationFrame(drawParticles);
+}
+
+drawParticles();
+
+// resize fix
+window.addEventListener("resize", () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 });
-    
 </script>
 
 </body>
