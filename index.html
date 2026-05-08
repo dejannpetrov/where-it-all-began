@@ -29,7 +29,8 @@ canvas {
   top: 0;
   left: 0;
   z-index: 0;
-  opacity: 0.75; /* 🔥 more visible now */
+  opacity: 0.95; /* 🔥 more visible now */
+  filter: blur(0.3px);
 }
 
 /* INTRO */
@@ -169,13 +170,20 @@ for (let i = 0; i < 100; i++) {
 function drawParticles() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "rgba(255,255,255,0.75)"; // 🔥 stronger glow
-
   particles.forEach(p => {
+    // glowing particles
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+
+    const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 6);
+    glow.addColorStop(0, "rgba(255,255,255,0.95)");
+    glow.addColorStop(0.4, "rgba(180,200,255,0.4)");
+    glow.addColorStop(1, "rgba(255,255,255,0)");
+
+    ctx.fillStyle = glow;
+    ctx.arc(p.x, p.y, p.r * 2.2, 0, Math.PI * 2);
     ctx.fill();
 
+    // movement
     p.y -= p.d;
 
     if (p.y < 0) {
