@@ -14,7 +14,6 @@
   box-sizing: border-box;
 }
 
-/* BACKGROUND */
 body {
   height: 100vh;
   overflow: hidden;
@@ -23,7 +22,7 @@ body {
   font-family: Inter, sans-serif;
 }
 
-/* 🔥 PARTICLES ALWAYS ON TOP */
+/* PARTICLES (calm, low distraction) */
 canvas {
   position: fixed;
   top: 0;
@@ -33,7 +32,6 @@ canvas {
   z-index: 9999;
   pointer-events: none;
   opacity: 0.6;
-  filter: blur(0.3px);
 }
 
 /* INTRO */
@@ -48,23 +46,18 @@ canvas {
   align-items: center;
   text-align: center;
   backdrop-filter: blur(6px);
-  transition: opacity 1.5s ease;
-  padding: 20px;
+  transition: opacity 1s ease;
 }
 
-/* TITLE */
 h1 {
   font-family: "Playfair Display", serif;
   font-weight: 400;
   font-size: 28px;
-  letter-spacing: 1.2px;
-  opacity: 0.95;
-
   white-space: nowrap;
   margin-bottom: 30px;
+  opacity: 0.95;
 }
 
-/* BUTTON */
 button {
   padding: 14px 30px;
   border-radius: 40px;
@@ -73,46 +66,36 @@ button {
   color: black;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(255,255,255,0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 button:active {
-  box-shadow: 0 0 35px rgba(255,255,255,0.9);
   transform: scale(0.98);
+  box-shadow: 0 0 30px rgba(255,255,255,0.8);
 }
 
-/* VIDEO LAYER */
+/* VIDEO */
 #videoContainer {
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 80%;
-  height: 45%;
-  transform: translate(-50%, -50%) scale(0.85);
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
   opacity: 0;
   z-index: 1;
-  transition: all 2s ease-in-out;
+  transition: opacity 2s ease;
 }
 
 video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 18px;
   filter: blur(6px) brightness(0.75);
   transition: filter 2s ease;
 }
 
 #videoContainer.active {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-  transform: translate(-50%, -50%) scale(1);
   opacity: 1;
 }
 
@@ -120,11 +103,27 @@ video {
   filter: blur(0px) brightness(1);
 }
 
-/* mobile fix */
-@media (max-width: 420px) {
-  h1 {
-    font-size: 22px;
-  }
+/* 🔥 OVERLAY POPUP */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10000;
+  transition: opacity 1.2s ease;
+}
+
+#overlay.show {
+  opacity: 1;
 }
 </style>
 </head>
@@ -136,30 +135,41 @@ video {
 <!-- INTRO -->
 <div id="intro">
   <h1>The Place Worth Remembering...</h1>
-  <button onclick="startVideo()">Relieve the Moment</button>
+  <button onclick="startSequence()">Relieve the Moment</button>
 </div>
+
+<!-- OVERLAY -->
+<div id="overlay">Where it began...</div>
 
 <!-- VIDEO -->
 <div id="videoContainer">
-  <video id="bgVideo" src="zoomnpin.mp4" playsinline></video>
+  <video id="bgVideo" src="your-video.mp4" playsinline></video>
 </div>
 
 <script>
 
-// VIDEO START
-function startVideo() {
+// BUTTON SEQUENCE
+function startSequence() {
   document.getElementById("intro").style.opacity = "0";
 
+  const overlay = document.getElementById("overlay");
   const videoContainer = document.getElementById("videoContainer");
   const video = document.getElementById("bgVideo");
 
+  // show overlay first
   setTimeout(() => {
+    overlay.classList.add("show");
+  }, 400);
+
+  // then start video
+  setTimeout(() => {
+    overlay.classList.remove("show");
     videoContainer.classList.add("active");
     video.play();
-  }, 800);
+  }, 2200);
 }
 
-// PARTICLES (WHITE CINEMATIC FLOATING DUST)
+// PARTICLES (soft memory dust)
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
@@ -173,7 +183,7 @@ for (let i = 0; i < 65; i++) {
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
     r: Math.random() * 2.2,
-    d: Math.random() * 1.4
+    d: Math.random() * 1.2
   });
 }
 
@@ -182,7 +192,7 @@ function drawParticles() {
 
   particles.forEach(p => {
 
-    const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 12);
+    const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 10);
 
     glow.addColorStop(0, "rgba(255,255,255,0.8)");
     glow.addColorStop(0.3, "rgba(255,255,255,0.25)");
@@ -191,10 +201,9 @@ function drawParticles() {
     ctx.fillStyle = glow;
 
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // smooth floating motion
     p.y -= p.d;
     p.x += Math.sin(p.y * 0.01) * 0.3;
 
@@ -209,7 +218,6 @@ function drawParticles() {
 
 drawParticles();
 
-// resize fix
 window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
